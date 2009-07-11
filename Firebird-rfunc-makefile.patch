@@ -1,0 +1,132 @@
+diff -U 3 -H -d -r -N -- ~Firebird-rfunc-2.1.3.1/source/Makefile Firebird-rfunc-2.1.3.1/source/Makefile
+--- ~Firebird-rfunc-2.1.3.1/source/Makefile	1970-01-01 01:00:00.000000000 +0100
++++ Firebird-rfunc-2.1.3.1/source/Makefile	2009-07-11 16:17:56.000000000 +0200
+@@ -0,0 +1,128 @@
++#====================================================================
++#		Based on makefile.linux
++#
++#		rFunc InterBase UDF library.
++#		Compilation tested with
++#		For Linux
++#
++#		Copyright 1998-2003 Polaris Software
++#		http://rfunc.sourceforge.net
++#		mailto:rFunc@mail.ru
++#
++#	 This library is free software; you can redistribute it and/or
++#	 modify it under the terms of the GNU Lesser General Public
++#	 License as published by the Free Software Foundation; either
++#	 version 2.1 of the License, or (at your option) any later version.
++#	 See license.txt for more details.
++#
++#====================================================================
++
++# Linux
++CP	= cp
++RM	= rm -f
++CC	= gcc
++LD	= ld
++LINK	= gcc
++LIBDIR  = /usr/lib
++
++include rfunc.conf
++
++ifndef TARGETNAME
++TARGETNAME	= rfunc
++endif
++
++OBJS	= $(TARGETNAME).o
++ifdef REXT
++OBJS	+= $(REXT).o
++endif
++
++IBVENDOR	= FIREBIRDSQL
++
++IBVERSION	= 6
++
++GDS_NAME	= fbclient
++
++EXTCFLAGS	= -DIB_$(IBVERSION)X -DIB_$(IBVENDOR) $(USERCFLAGS)
++LIB_LINK_FLAGS	= -shared
++ifneq ($(RUSE_GUID),No)
++EXTCFLAGS	+= -DRUSE_GUID
++LIB_LINK_FLAGS	+= -luuid
++endif
++
++ifeq ($(RGUID_WIN_STYLE),Yes)
++EXTCFLAGS	+= -DRGUID_WIN_STYLE
++endif
++
++ifneq ($(RUSE_DATETIME),No)
++EXTCFLAGS	+= -DRUSE_DATETIME
++endif
++
++ifeq ($(RUSE_FILE),Yes)
++EXTCFLAGS	+= -DRUSE_FILE
++OBJS		+= rfile.o
++endif
++
++ifeq ($(IBVERSION),6)
++INSTALLTO	= "$(IBASE)/UDF"
++ifeq ($(IBVENDOR),BORLAND)
++SDKDIR		= /SDK
++endif
++else
++INSTALLTO	= $(LIBDIR)
++endif
++
++ifeq ($(IBVERSION),4)
++undef RFUNCIBUTILLIB
++else
++RFUNCIBUTILLIB	= $(LIBDIR)/libib_util.so
++endif
++
++CFLAGS		= -c -w -DLINUX $(EXTCFLAGS) $(INCLUDE)
++LIB_CFLAGS	= -fPIC $(CFLAGS)
++LINK_FLAGS	= -l$(GDS_NAME) -ldl -lcrypt
++LIB_LINK_FLAGS	+= -l$(GDS_NAME)
++
++LIBRARIES	= $(LIBDIR}/libm.so $(RFUNCIBUTILLIB)
++TARGET		= $(TARGETNAME)
++OBJS		+= rblob.o rcalc.o rdatetime.o rmath.o rmisc.o rsecurity.o rstring.o win1251.o rmd5c.o
++
++.SUFFIXES: .o .c
++
++.c.o:
++	$(CC) $< $(LIB_CFLAGS) -o $@
++
++.o:
++	$(LINK) -o $@ $< $(LINK_FLAGS)
++
++all:	$(TARGET)
++
++$(TARGET):	$(OBJS)
++	$(LD) $(OBJS) -o $@ $(LIBRARIES) $(LIB_LINK_FLAGS)
++
++rfunc.o:	rfunc.c rfunc.h
++
++rstring.o:	rstring.c rstring.h rmath.h rfunc.h
++
++rdatetime.o:	rdatetime.c rdatetime.h win1251.h rfunc.h
++
++rcalc.o:	rcalc.c rcalc.h rfunc.h
++
++rblob.o:	rblob.c rblob.h rstring.h win1251.h rfunc.h
++
++rsecurity.o:	rsecurity.c rsecurity.h rfunc.h
++
++rmath.o:	rmath.c rmath.h rfunc.h
++
++rmisc.o:	rmisc.c rmisc.h rfunc.h
++
++win1251.o:	win1251.c win1251.h rfunc.h rmath.h
++
++rfile.o:	rfile.c rfile.h rfunc.h
++
++rmd5c.o:	rmd5c.c rmd5.h rfunc.h
++
++install:
++	$(CP) $(TARGET) $(INSTALLTO)
++
++clean:
++	$(RM) $(OBJS)
