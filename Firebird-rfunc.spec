@@ -6,7 +6,7 @@ Version:	2.1.3.1
 Release:	0.%{subver}.1
 License:	LGPL v2.1
 Group:		Libraries
-Source0:	http://dl.sourceforge.net/rfunc/%{pname}-%{version}-RC1-unix.tar.gz
+Source0:	http://downloads.sourceforge.net/rfunc/%{pname}-%{version}-RC1-unix.tar.gz
 # Source0-md5:	8105d437b058defb82d83aac9b665b6d
 Patch0:		%{name}-makefile.patch
 URL:		http://rfunc.sourceforge.net/
@@ -19,8 +19,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 rFunc is a UDF Library for InterBase/Firebird server. The library
-represents a set of user's (UDF) string, bit, numerical functions,
-and also for operation with dates&time and BLOBs.
+represents a set of user's (UDF) string, bit, numerical functions, and
+also for operation with dates&time and BLOBs.
 
 %prep
 %setup -q -c
