@@ -24,7 +24,7 @@ also for operation with dates&time and BLOBs.
 
 %prep
 %setup -q -c
-%patch0 -p1
+%patch -P0 -p1
 
 %build
 %{__make} -C source \
